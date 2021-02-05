@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+			@import url('https://fonts.googleapis.com/css2?family=Maven+Pro:wght@600&display=swap');
+			@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200&display=swap');
+			.container {
+				max-width: 960px;
+				margin: 30px auto;
+				padding: 20px;
+			}
+			.box_1 {
+				float: left;
+				width: 500px;
+				height: 500px;
+				margin-left: 700px;
+				margin-bottom: 200px;
+			}
+			.time {
+				float: right;
+				width: 400px;
+				height: 600px;
+				margin: auto;
+			}
+			.box_2 {
+				display: inline-block;
+				float: right;
+				width: 600px;
+				height: 600px;
+				margin-right: 350px;
+			}
+			.Header {
+				height: 300px;
+			}
+			.box_21 {
+				font-size: 25px;
+				font-family: 'Maven Pro','Noto Serif KR', sans-serif;
+				width: 300px;
+				height: 60px;
+				margin: 0 auto;
+				background-color: white;
+			}
+			.box_211{
+				font-size: 15px;
+				font-family: 'Maven Pro','Noto Serif KR', sans-serif;
+				width: 300px;
+				height: 10px;
+				margin: 0 auto;
+				background-color: white;
+			}
+			.box_22 {
+				overflow: scroll;
+				width: 300px;
+				height: 300px;
+				margin: 0 auto;
+			}
+			h1 {
+				font-size: 45px;
+				font-family: 'Maven Pro', sans-serif;
+				text-align: center;
+				margin: 20px 0 20px;
+			}
+			h5 {
+				font-family: 'Noto Serif KR', serif;
+				font-size: 20px;
+				text-align: center;
+				margin: auto;
+				line-height: 3 !important;
+			}
+			.button {
+				font-family: 'Maven Pro', sans-serif;
+				background-color: white;
+				border: none;
+				color: black;
+				padding: 2px;
+				text-align: right;
+				text-decoration: none;
+				font-size: 25px;
+				margin: 100px 300px;
+			}
+		</style>
+		<link rel="stylesheet" href="style.css" />
+
+		<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js"></script>
+		<script
+			type="text/javascript"
+			charset="utf-8"
+			src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"
+		></script>
+		<script src="/com/js/Chart.PieceLabel.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+	</head>
+	<body>
+		<div class="container">
+			<h1>
+				<div>
+					<a style="color: #ffa3b1;">RE</a><a style="color: #bab86c;">SULT</a>
+					<script>
+						document.write('<hr>');
+					</script>
+					<p></p>
+				</div>
+			</h1>
+		</div>
+		<div class="box_1">
+			<canvas id="myChart" width="400" height="400">
+				</canvas>
+		</div>
+
+		<div class="box_2" id="content">
+			<div class="box_21">Time Table
+				<p></p></div>
+			<div class="box_211">
+				흰색이 공부시간입니다.
+			</div>
+			<div style="height: 40px;"></div>
+			<div class="box_22" id="timeline"></div>
+			<p></p>
+			<button class="button" type="button" onclick="location.href='index.html', index()">
+				<a
+					><img
+						src="https://s3.amazonaws.com/freestock-prod/450/freestock_562242718.jpg"
+						width="20"
+						height="20" /></a
+				><a>Home</a>
+			</button>
+		</div>
+		<script type="text/javascript">
+			var studying = JSON.parse(localStorage.getItem('studying'));
+
+			// =========== 결과를 result1에 저장(미완입니다.)
+			// 목표: 연속된 studying 값들이 존재할때 공부를 시작한 시각과 끝난 시각의 양 끝을 저장하기 위함
+			var result1 = [[0, 0]];
+			var i = 0;
+
+			// 5번째부터(5번째부터 한 이유는 연속된 동작이 모두 공부중이거나 공부중이지 않을때만 저장하기 위함) 마지막까지 반복
+			for (i = 5; i < studying.length; i++) {
+				// if문을 통해 연속된 5개의 항목중 양 끝 값이 0.5를 넘는다면 공부중인 것으로 간주
+				if (
+					studying[i][0] > 0.5 &&
+					studying[i - 1][0] > 0.5 &&
+					studying[i - 2][0] > 0.5 &&
+					studying[i - 3][0] > 0.5 &&
+					studying[i - 4][0] > 0.5 &&
+					studying[i - 5][0] <= 0.5
+				) {
+					result1.push([studying[i][1], 1]); // 공부중인 경우는 [그 때의 studying 값,  1]로 저장
+				} else if (
+					studying[i - 1][0] <= 0.5 &&
+					studying[i - 2][0] <= 0.5 &&
+					studying[i - 3][0] <= 0.5 &&
+					studying[i - 4][0] <= 0.5 &&
+					studying[i - 5][0] > 0.5
+				) {
+					result1.push([studying[i][1], 0]); // 공부중이지 않은 경우는 [그 때의 studying 값, 0]으로 저장
+				}
+			}
+
+			//document.write(result1, '<br>', 'end');
+
+			var Y = 0; // 공부한 시간
+			var X = 0; // 공부 안한 시간
+
+			if (result1[0][1] == 0) {
+				Y += result1[0][0];
+			} else {
+				X += result1[0][0];
+			}
+
+			for (i = 1; i < result1.length; i++) {
+				if (result1[i][1] == 0) {
+					Y += result1[i][0] - result1[i - 1][0];
+				} else {
+					X += result1[i][0] - result1[i - 1][0];
+				}
+			}
+
+			var i;
+			for (i = 0; i < result1.length - 1; i++) {
+				//새로운 div를 timeline(box_22)에 추가
+				var div = parent.document.createElement('div');
+
+				// id 는 id_1, id_2 이런식
+				var id_name = 'id_' + String(i);
+				div.id = id_name;
+
+			
+
+				// 내용 부분
+				div.innerHTML =
+					'<span>' +
+					sec2time(String(result1[i][0])) +
+					'  ~  ' +
+					sec2time(String(result1[i + 1][0])) +
+					' <span>';
+
+				// style 부분 div.style~~ 이런식으로 넣으면 돼요
+				// text-align 같은 원래 css에서 '-' 얘가 있는건 다음문자에서 대문자로 textAlign 이렇게 쓰면 돼요
+
+				if (result1[i][1] == 1){
+					div.style.backgroundColor = 'lightgrey'
+					div.style.color = 'white'
+				}
+				else {
+					div.style.backgroundColor = 'white'
+					div.style.color = 'black'
+				}
+				
+				div.style.textAlign = 'center';
+				
+
+				// 특정 필드에 심기
+				parent.document.getElementById('timeline').appendChild(div);
+			}
+
+			// data
+			var data = [Y, X];
+
+			// plot
+			let ctx = document.getElementById('myChart').getContext('2d');
+			let myChart = new Chart(ctx, {
+				type: 'doughnut',
+				data: {
+					labels: ['공부함', '공부안함'],
+					datasets: [
+						{
+							label: '공부시간',
+							data: data,
+							backgroundColor: [
+								'rgba(255, 182, 193, 0.5)',
+								'rgba(186, 184, 108, 0.5)',
+							],
+							borderColor: ['rgba(255, 182, 193, 0.5)', 'rgba(186, 184, 108, 0.5)'],
+						},
+					],
+				},
+			});
+
+			function sec2time(timeInSeconds) {
+				var pad = function (num, size) {
+						return ('000' + num).slice(size * -1);
+					},
+					time = parseFloat(timeInSeconds).toFixed(3),
+					hours = Math.floor(time / 60 / 60),
+					minutes = Math.floor(time / 60) % 60,
+					seconds = Math.floor(time - minutes * 60),
+					milliseconds = time.slice(-3);
+
+				return pad(hours, 1) + ':' + pad(minutes, 2) + ':' + pad(seconds, 2);
+			}
+		</script>
+		<div class="time">
+			<h5>
+				<script>
+					var x = sec2time(X);
+					var y = sec2time(Y);
+					var xy = sec2time(Y + X);
+					document.write('총 공부시간 | ', xy);
+					document.write('<hr>');
+					document.write('순 공부시간 | ', y);
+					document.write('<hr>');
+					var XY = Y + X;
+					var per = Y / XY;
+					var fin = Math.floor(per * 100);
+					document.write('집중도 | ', fin, '%');
+				</script>
+				
+			</h5>
+			
+		</div>
+		<p></p>
+	</body>
+</html>
